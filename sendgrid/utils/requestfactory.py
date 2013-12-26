@@ -2,6 +2,7 @@
 from django.test import Client
 from django.core.handlers.wsgi import WSGIRequest
 
+
 class RequestFactory(Client):
     """
     Class that lets you create mock Request objects for use in testing.
@@ -19,6 +20,7 @@ class RequestFactory(Client):
     just as if that view had been hooked up using a URLconf.
     
     """
+
     def request(self, **request):
         """
         Similar to parent class, but returns the request object as soon as it
