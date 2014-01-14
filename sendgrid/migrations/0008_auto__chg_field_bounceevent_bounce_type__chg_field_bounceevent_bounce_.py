@@ -8,32 +8,23 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'EventType'
-        db.create_table('sendgrid_eventtype', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=128)),
-        ))
-        db.send_create_signal('sendgrid', ['EventType'])
+        # Changing field 'BounceEvent.bounce_type'
+        db.alter_column('sendgrid_bounceevent', 'bounce_type_id',
+                        self.gf('django.db.models.fields.related.ForeignKey')(to=orm['sendgrid.BounceType'], null=True))
 
-        # Adding model 'Event'
-        db.create_table('sendgrid_event', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('email_message', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['sendgrid.EmailMessage'])),
-            ('email', self.gf('django.db.models.fields.EmailField')(max_length=75)),
-            ('type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['sendgrid.EventType'])),
-            ('creation_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('last_modified_time', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal('sendgrid', ['Event'])
-
+        # Changing field 'BounceEvent.bounce_reason'
+        db.alter_column('sendgrid_bounceevent', 'bounce_reason_id',
+                        self.gf('django.db.models.fields.related.ForeignKey')(to=orm['sendgrid.BounceReason'],
+                                                                              null=True))
 
     def backwards(self, orm):
-        # Deleting model 'EventType'
-        db.delete_table('sendgrid_eventtype')
+        # User chose to not deal with backwards NULL issues for 'BounceEvent.bounce_type'
+        raise RuntimeError(
+            "Cannot reverse this migration. 'BounceEvent.bounce_type' and its values cannot be restored.")
 
-        # Deleting model 'Event'
-        db.delete_table('sendgrid_event')
-
+        # User chose to not deal with backwards NULL issues for 'BounceEvent.bounce_reason'
+        raise RuntimeError(
+            "Cannot reverse this migration. 'BounceEvent.bounce_reason' and its values cannot be restored.")
 
     models = {
         'sendgrid.argument': {
@@ -44,12 +35,62 @@ class Migration(SchemaMigration):
             'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'last_modified_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
+        'sendgrid.bounceevent': {
+            'Meta': {'object_name': 'BounceEvent', '_ormbases': ['sendgrid.Event']},
+            'bounce_reason': (
+            'django.db.models.fields.related.ForeignKey', [], {'to': "orm['sendgrid.BounceReason']", 'null': 'True'}),
+            'bounce_type': (
+            'django.db.models.fields.related.ForeignKey', [], {'to': "orm['sendgrid.BounceType']", 'null': 'True'}),
+            'event_ptr': ('django.db.models.fields.related.OneToOneField', [],
+                          {'to': "orm['sendgrid.Event']", 'unique': 'True', 'primary_key': 'True'}),
+            'status': ('django.db.models.fields.CharField', [], {'max_length': '16'})
+        },
+        'sendgrid.bouncereason': {
+            'Meta': {'object_name': 'BounceReason'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'reason': ('django.db.models.fields.TextField', [], {})
+        },
+        'sendgrid.bouncetype': {
+            'Meta': {'object_name': 'BounceType'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'type': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32'})
+        },
         'sendgrid.category': {
             'Meta': {'object_name': 'Category'},
             'creation_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_modified_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '150'})
+        },
+        'sendgrid.clickevent': {
+            'Meta': {'object_name': 'ClickEvent', '_ormbases': ['sendgrid.Event']},
+            'click_url': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sendgrid.ClickUrl']"}),
+            'event_ptr': ('django.db.models.fields.related.OneToOneField', [],
+                          {'to': "orm['sendgrid.Event']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        'sendgrid.clickurl': {
+            'Meta': {'object_name': 'ClickUrl'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'url': ('django.db.models.fields.TextField', [], {})
+        },
+        'sendgrid.deferredevent': {
+            'Meta': {'object_name': 'DeferredEvent', '_ormbases': ['sendgrid.Event']},
+            'attempt': ('django.db.models.fields.IntegerField', [], {}),
+            'event_ptr': ('django.db.models.fields.related.OneToOneField', [],
+                          {'to': "orm['sendgrid.Event']", 'unique': 'True', 'primary_key': 'True'}),
+            'response': ('django.db.models.fields.TextField', [], {})
+        },
+        'sendgrid.deliverredevent': {
+            'Meta': {'object_name': 'DeliverredEvent', '_ormbases': ['sendgrid.Event']},
+            'event_ptr': ('django.db.models.fields.related.OneToOneField', [],
+                          {'to': "orm['sendgrid.Event']", 'unique': 'True', 'primary_key': 'True'}),
+            'response': ('django.db.models.fields.TextField', [], {})
+        },
+        'sendgrid.droppedevent': {
+            'Meta': {'object_name': 'DroppedEvent', '_ormbases': ['sendgrid.Event']},
+            'event_ptr': ('django.db.models.fields.related.OneToOneField', [],
+                          {'to': "orm['sendgrid.Event']", 'unique': 'True', 'primary_key': 'True'}),
+            'reason': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
         'sendgrid.emailmessage': {
             'Meta': {'object_name': 'EmailMessage'},
@@ -130,9 +171,10 @@ class Migration(SchemaMigration):
             'creation_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75'}),
             'email_message': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sendgrid.EmailMessage']"}),
+            'event_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sendgrid.EventType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_modified_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sendgrid.EventType']"})
+            'timestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True'})
         },
         'sendgrid.eventtype': {
             'Meta': {'object_name': 'EventType'},

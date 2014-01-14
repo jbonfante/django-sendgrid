@@ -3,10 +3,10 @@ from django import forms
 
 class EmailForm(forms.Form):
 	subject = forms.CharField(max_length=100)
-	message = forms.CharField()
+	message = forms.CharField(widget=forms.Textarea)
 	sender = forms.EmailField()
 	to = forms.EmailField()
-	category = forms.CharField(max_length=100, required=False)
+	categories = forms.CharField(help_text="CSV", required=False, widget=forms.Textarea)
 	html = forms.BooleanField(initial=False, required=False)
 	enable_gravatar = forms.BooleanField(initial=False, required=False)
 	enable_click_tracking = forms.BooleanField(initial=False, required=False)

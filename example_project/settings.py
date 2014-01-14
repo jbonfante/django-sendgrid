@@ -99,6 +99,7 @@ MIDDLEWARE_CLASSES = (
 	'django.middleware.csrf.CsrfViewMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
+	'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'example_project.urls'
@@ -122,6 +123,7 @@ INSTALLED_APPS = (
 	# 'django.contrib.admindocs',
 	'south',
 	'sendgrid',
+	'debug_toolbar',
 	'main',
 )
 
@@ -160,6 +162,7 @@ LOGGING = {
 	}
 }
 
+INTERNAL_IPS = ('127.0.0.1',)
 
 # django-sendgrid
 # ---------------
@@ -170,6 +173,7 @@ SENDGRID_EMAIL_HOST = "smtp.sendgrid.net"
 SENDGRID_EMAIL_PORT = 587
 SENDGRID_EMAIL_USERNAME = os.getenv("SENDGRID_EMAIL_USERNAME")
 SENDGRID_EMAIL_PASSWORD = os.getenv("SENDGRID_EMAIL_PASSWORD")
+# SENDGRID_CREATE_MISSING_EMAIL_MESSAGES = True
 
 try:
 	from settings_local import *

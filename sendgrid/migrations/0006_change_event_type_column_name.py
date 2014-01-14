@@ -8,33 +8,20 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Category'
-        db.create_table('sendgrid_category', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=150)),
-            ('creation_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('last_modified_time', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal('sendgrid', ['Category'])
-
-        # Adding M2M table for field categories on 'EmailMessage'
-        db.create_table('sendgrid_emailmessage_categories', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('emailmessage', models.ForeignKey(orm['sendgrid.emailmessage'], null=False)),
-            ('category', models.ForeignKey(orm['sendgrid.category'], null=False))
-        ))
-        db.create_unique('sendgrid_emailmessage_categories', ['emailmessage_id', 'category_id'])
-
+        db.rename_column('sendgrid_event', 'type_id', 'event_type_id')
 
     def backwards(self, orm):
-        # Deleting model 'Category'
-        db.delete_table('sendgrid_category')
-
-        # Removing M2M table for field categories on 'EmailMessage'
-        db.delete_table('sendgrid_emailmessage_categories')
-
+        db.rename_column('sendgrid_event', 'event_type_id', 'type_id')
 
     models = {
+        'sendgrid.argument': {
+            'Meta': {'object_name': 'Argument'},
+            'creation_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'data_type': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'last_modified_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        },
         'sendgrid.category': {
             'Meta': {'object_name': 'Category'},
             'creation_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -44,6 +31,9 @@ class Migration(SchemaMigration):
         },
         'sendgrid.emailmessage': {
             'Meta': {'object_name': 'EmailMessage'},
+            'arguments': ('django.db.models.fields.related.ManyToManyField', [],
+                          {'to': "orm['sendgrid.Argument']", 'through': "orm['sendgrid.UniqueArgument']",
+                           'symmetrical': 'False'}),
             'categories': ('django.db.models.fields.related.ManyToManyField', [],
                            {'to': "orm['sendgrid.Category']", 'symmetrical': 'False'}),
             'category': (
@@ -112,6 +102,29 @@ class Migration(SchemaMigration):
             'email_message': ('django.db.models.fields.related.OneToOneField', [],
                               {'related_name': "'to'", 'unique': 'True', 'primary_key': 'True',
                                'to': "orm['sendgrid.EmailMessage']"})
+        },
+        'sendgrid.event': {
+            'Meta': {'object_name': 'Event'},
+            'creation_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75'}),
+            'email_message': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sendgrid.EmailMessage']"}),
+            'event_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sendgrid.EventType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_modified_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        },
+        'sendgrid.eventtype': {
+            'Meta': {'object_name': 'EventType'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '128'})
+        },
+        'sendgrid.uniqueargument': {
+            'Meta': {'object_name': 'UniqueArgument'},
+            'argument': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sendgrid.Argument']"}),
+            'creation_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'data': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'email_message': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sendgrid.EmailMessage']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_modified_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         }
     }
 
