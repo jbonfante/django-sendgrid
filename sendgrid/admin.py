@@ -107,7 +107,7 @@ class EventInline(admin.TabularInline):
     model = Event
     can_delete = False
     extra = 0
-    readonly_fields = ("email", "type")
+    readonly_fields = ("email", "event_type")
 
 
 class UniqueArgumentsInLine(admin.TabularInline):
