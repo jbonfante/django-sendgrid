@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import datetime
 import logging
@@ -89,7 +89,7 @@ def save_email_message(sender, **kwargs):
         recipients = getattr(message, "to", None)
         toEmail = recipients[0]
         categoryData = message.sendgrid_headers.data.get("category", None)
-        if isinstance(categoryData, basestring):
+        if isinstance(categoryData, str):
             category = categoryData
             categories = [category]
         else:
@@ -117,7 +117,7 @@ def save_email_message(sender, **kwargs):
 
         uniqueArgsData = message.sendgrid_headers.data.get("unique_args", None)
         if uniqueArgsData:
-            for k, v in uniqueArgsData.iteritems():
+            for k, v in uniqueArgsData.items():
                 argument, argumentCreated = Argument.objects.get_or_create(key=k)
                 if argumentCreated:
                     logger.debug("Argument {a} was created".format(a=argument))
@@ -127,7 +127,7 @@ def save_email_message(sender, **kwargs):
                     data=v,
                 )
 
-        for component, componentModel in COMPONENT_DATA_MODEL_MAP.iteritems():
+        for component, componentModel in COMPONENT_DATA_MODEL_MAP.items():
             if component in SENDGRID_EMAIL_TRACKING_COMPONENTS:
                 if component == "sendgrid_headers":
                     componentData = message.sendgrid_headers.as_string()
@@ -221,7 +221,7 @@ class EmailMessage(models.Model):
             emailMessage = UniqueArgument.objects.get(data=newsletter_id, argument__key="newsletter[newsletter_id]",
                                                       email_message__to_email=to_email).email_message
         except UniqueArgument.DoesNotExist:
-            categories = [value for key, value in event_dict.items() if 'category' in key]
+            categories = [value for key, value in list(event_dict.items()) if 'category' in key]
             emailMessageSpec = {
                 "message_id": event_dict.get("message_id", None),
                 "from_email": "",
@@ -241,7 +241,7 @@ class EmailMessage(models.Model):
             for key in UNIQUE_ARGS_STORED_FOR_EVENTS_WITHOUT_MESSAGE_ID:
                 uniqueArgs[key] = event_dict.get(key)
 
-            for argName, argValue in uniqueArgs.items():
+            for argName, argValue in list(uniqueArgs.items()):
                 argument, _ = Argument.objects.get_or_create(
                     key=argName
                 )
@@ -471,7 +471,7 @@ class Event(models.Model):
         verbose_name_plural = _("Events")
 
     def __unicode__(self):
-        return u"{0} - {1}".format(self.email_message, self.event_type)
+        return "{0} - {1}".format(self.email_message, self.event_type)
 
 
 class ClickUrl(models.Model):
@@ -486,7 +486,7 @@ class ClickEvent(Event):
         verbose_name_plural = ("Click Events")
 
     def __unicode__(self):
-        return u"{0} - {1}".format(super(ClickEvent, self).__unicode__(), self.url)
+        return "{0} - {1}".format(super(ClickEvent, self).__unicode__(), self.url)
 
     def get_url(self):
         return self.click_url.url
@@ -518,7 +518,7 @@ class BounceEvent(Event):
         verbose_name_plural = ("Bounce Events")
 
     def __unicode__(self):
-        return u"{0} - {1}".format(super(self, BounceEvent).__unicode__(), reason)
+        return "{0} - {1}".format(super(self, BounceEvent).__unicode__(), reason)
 
     def get_reason(self):
         return self.bounce_reason.reason

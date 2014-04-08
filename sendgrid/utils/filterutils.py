@@ -55,8 +55,8 @@ def validate_filter_specification(f):
     passedAllTests = None
 
     testResults = {}
-    for filter, spec in f.iteritems():
-        for setting, value in spec.iteritems():
+    for filter, spec in f.items():
+        for setting, value in spec.items():
             testKey = ".".join([filter, setting])
             testResult = validate_filter_setting_value(filter, setting, value)
             testResults[testKey] = testResult
@@ -75,8 +75,8 @@ def update_filters(email, filterSpec, validate=VALIDATE_FILTER_SPECIFICATION):
         if not filterSpecIsValid:
             raise Exception("Invalid filter specification")
 
-    for filter, spec in filterSpec.iteritems():
-        for setting, value in spec.iteritems():
+    for filter, spec in filterSpec.items():
+        for setting, value in spec.items():
             email.sendgrid_headers.addFilterSetting(fltr=filter, setting=setting, val=value)
 
     return

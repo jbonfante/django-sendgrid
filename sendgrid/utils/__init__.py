@@ -1,14 +1,14 @@
 import datetime
-import httplib
+import http.client
 import logging
 import time
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 try:
-    import cStringIO as StringIO
+    import io as StringIO
 except ImportError:
-    import StringIO
+    import io
 
 from django.conf import settings
 from django.core import mail
@@ -48,7 +48,7 @@ def remove_keys_without_value(d):
     """
     dCopy = d.copy()
 
-    delKeys = [k for k, v in dCopy.iteritems() if not v]
+    delKeys = [k for k, v in dCopy.items() if not v]
     for k in delKeys:
         del dCopy[k]
 
@@ -98,9 +98,9 @@ def get_unsubscribes(date=None, days=None, start_date=None, end_date=None, limit
     }
     parameters = normalize_parameters(parameters)
 
-    data = urllib.urlencode(parameters)
-    request = urllib2.Request(ENDPOINT, data)
-    response = urllib2.urlopen(request)
+    data = urllib.parse.urlencode(parameters)
+    request = urllib.request.Request(ENDPOINT, data)
+    response = urllib.request.urlopen(request)
     content = response.read()
 
     return content
@@ -117,9 +117,9 @@ def add_unsubscribes(email):
     }
     parameters = normalize_parameters(parameters)
 
-    data = urllib.urlencode(parameters)
-    request = urllib2.Request(ENDPOINT, data)
-    response = urllib2.urlopen(request)
+    data = urllib.parse.urlencode(parameters)
+    request = urllib.request.Request(ENDPOINT, data)
+    response = urllib.request.urlopen(request)
     content = response.read()
 
     return content
@@ -141,9 +141,9 @@ def delete_unsubscribes(email, start_date=None, end_date=None):
     }
     parameters = normalize_parameters(parameters)
 
-    data = urllib.urlencode(parameters)
-    request = urllib2.Request(ENDPOINT, data)
-    response = urllib2.urlopen(request)
+    data = urllib.parse.urlencode(parameters)
+    request = urllib.request.Request(ENDPOINT, data)
+    response = urllib.request.urlopen(request)
     content = response.read()
 
     return content
@@ -160,9 +160,9 @@ def zip_files(files):
     import zipfile
     from contextlib import closing
 
-    buffer = StringIO.StringIO()
+    buffer = io.StringIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zio:
-        for name, content in files.iteritems():
+        for name, content in files.items():
             zio.writestr(name, content)
         buffer.flush()
 

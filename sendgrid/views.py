@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import logging
 from datetime import datetime
@@ -77,7 +77,7 @@ def handle_single_event_request(request):
             else:
                 logger.debug(
                     "Expected post param {key} for Sendgrid Event {event} not found".format(key=key, event=event))
-        event_model = eval(EVENT_MODEL_NAMES[event]) if event in EVENT_MODEL_NAMES.keys() else Event
+        event_model = eval(EVENT_MODEL_NAMES[event]) if event in list(EVENT_MODEL_NAMES.keys()) else Event
         eventObj = event_model.objects.create(**event_params)
 
     response = HttpResponse()

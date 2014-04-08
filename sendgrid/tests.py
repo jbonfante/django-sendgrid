@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 from collections import defaultdict
 
@@ -154,7 +154,7 @@ class SendGridEmailTest(TestCase):
         email.sendgrid_headers.setUniqueArgs(uniqueArgs)
         email.send()
 
-        for k, v in uniqueArgs.iteritems():
+        for k, v in uniqueArgs.items():
             self.assertEqual(v, email.sendgrid_headers.data["unique_args"][k])
 
         self.assertTrue(email.sendgrid_headers.data["unique_args"]["message_id"])
@@ -484,9 +484,9 @@ class EventPostTests(TestCase):
         Tests all event types listed in EVENT_MODEL_NAMES
         Checks that every EXTRA_FIELD is saved
         """
-        for event_type, event_model_name in EVENT_MODEL_NAMES.items():
-            print "Testing {0} event".format(event_type)
-            event_model = eval(EVENT_MODEL_NAMES[event_type]) if event_type in EVENT_MODEL_NAMES.keys() else Event
+        for event_type, event_model_name in list(EVENT_MODEL_NAMES.items()):
+            print("Testing {0} event".format(event_type))
+            event_model = eval(EVENT_MODEL_NAMES[event_type]) if event_type in list(EVENT_MODEL_NAMES.keys()) else Event
             event_count_before = event_model.objects.count()
             response = post_test_event(event_type, event_model_name, self.email_message)
             self.assertEqual(event_model.objects.count(), event_count_before + 1)
@@ -513,7 +513,7 @@ class EventTypeFixtureTests(TestCase):
         }
 
     def test_event_types_exists(self):
-        for name, primaryKey in self.expectedEventTypes.iteritems():
+        for name, primaryKey in self.expectedEventTypes.items():
             self.assertEqual(
                 EventType.objects.get(pk=primaryKey),
                 EventType.objects.get(name=name)
@@ -530,7 +530,7 @@ class DownloadAttachmentTestCase(TestCase):
         emailMessage = SendGridEmailMessage(
             to=TEST_RECIPIENTS,
             from_email=TEST_SENDER_EMAIL)
-        for name, contents in self.attachments.iteritems():
+        for name, contents in self.attachments.items():
             emailMessage.attach(name, contents)
 
         response = emailMessage.send()

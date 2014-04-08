@@ -26,7 +26,7 @@ def check_settings(fail_silently=False):
         "SENDGRID_EMAIL_PASSWORD": SENDGRID_EMAIL_PASSWORD,
     }
 
-    for key, value in checks.iteritems():
+    for key, value in checks.items():
         if not value:
             logger.warn("{k} is not set".format(k=key))
             allOk = False
